@@ -19,14 +19,16 @@ class ExcelRequest(BaseModel):
 
 app = FastAPI(title="API OCR Local Tesseract")
 
+# --- CORS ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Permite cualquier frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# --- Endpoints ---
 @app.post("/ocr")
 async def ocr_image(request: OCRRequest):
     try:
@@ -36,6 +38,7 @@ async def ocr_image(request: OCRRequest):
         image_bytes = base64.b64decode(base64_data)
 
         text = ocr_local(image_bytes)
+        # Si quieres extraer campos automáticamente, puedes modificar el dict 'campos'
         return {"text": text, "campos": {}}
     except Exception as e:
         print("Error en /ocr:", str(e))
@@ -58,13 +61,14 @@ async def export_to_excel(data: ExcelRequest):
 
         return {"message": "Archivo Excel generado correctamente.", "path": output_file}
     except Exception as e:
+        print("Error en /exportar_excel:", str(e))
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 @app.get("/")
 def root():
     return {"message": "API OCR Local lista."}
 
-# Para pruebas locales
+# --- Para pruebas locales ---
 if __name__ == "__main__":
     import uvicorn
     PORT = int(os.environ.get("PORT", 8000))
