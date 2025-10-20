@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+openpyxl
+pytesseract
+Pillow
+python-multipart
